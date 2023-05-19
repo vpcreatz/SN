@@ -26,7 +26,7 @@ from bot.helper.mirror_utils.upload_utils.pyrogramEngine import TgUploader
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import sendMessage, delete_all_messages, update_all_messages, auto_delete_upload_message, sendPhoto
 from bot import aria2, bot, DOWNLOAD_DIR, LOGGER, Interval, config_dict, user_data, DATABASE_URL, download_dict_lock, download_dict, \
-                queue_dict_lock, non_queued_dl, non_queued_up, queued_up, queued_dl, tgBotMaxFileSize, status_reply_dict_lock
+                queue_dict_lock, non_queued_dl, non_queued_up, queued_up, queued_dl, tgBotMaxFileSize, status_reply_dict_lock, OWNER_ID
 
 class MirrorLeechListener:
     def __init__(self, bot, message, isZip=False, extract=False, isQbit=False, isLeech=False, pswd=None, tag=None, select=False, seed=False, c_index=0, u_index=None):
@@ -486,8 +486,11 @@ class MirrorLeechListener:
                 msg += f'\n<b>Mirror By: </b>{self.tag}\n\n' 
             buttons = ButtonMaker()
             link = short_url(link, user_id_)
-            if config_dict['DISABLE_DRIVE_LINK'] and self.message.chat.type != 'private':
-                pass
+            if config_dict['DISABLE_DRIVE_LINK']:
+                if self.user_id == OWNER_ID:
+                    buttons.buildbutton("☁️ Drive Link", link)
+                else:
+                    pass
             else:
                 buttons.buildbutton("☁️ Drive Link", link)
             LOGGER.info(f'Done Uploading {name}')
