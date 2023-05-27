@@ -19,7 +19,6 @@ from bot import bot, config_dict, ulist_listener, user_data, DRIVES_NAMES, DRIVE
 from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.ext_utils.bot_utils import get_readable_file_size, setInterval, change_filename, getGDriveUploadUtils, userlistype
 from bot.helper.ext_utils.fs_utils import get_mime_type
-from bot.helper.ext_utils.shortenurl import short_url
 
 LOGGER = getLogger(__name__)
 getLogger('googleapiclient.discovery').setLevel(ERROR)
@@ -271,7 +270,7 @@ class GoogleDriveHelper:
         # File body description
         file_metadata = {
             "name": directory_name,
-            "description": f"{config_dict['GD_INFO']}",
+            "description": f"Uploaded By Atrocious Mirror",
             "mimeType": self.__G_DRIVE_DIR_MIME_TYPE
         }
         if dest_id is not None:
@@ -291,7 +290,7 @@ class GoogleDriveHelper:
         # File body description
         file_metadata = {
             'name': file_name,
-            'description': f"{config_dict['GD_INFO']}",
+            'description': f"Uploaded By Atrocious Mirror",
             'mimeType': mime_type,
         }
         if dest_id is not None:
@@ -383,20 +382,12 @@ class GoogleDriveHelper:
                     self.deletefile(durl)
                     return "your clone has been stopped and cloned data has been deleted!", "cancelled"
                 _, f_name, _ = change_filename(meta.get("name"), self.user_id, all_edit=False, mirror_type=True)
-                if config_dict['EMOJI_THEME']:
-                    msg += f'<b>🗂️ Name: </b><code>{f_name}</code>'
-                    msg += f'\n<b>📦 Size: </b>{get_readable_file_size(self.transferred_size)}'
-                    msg += f'\n<b>♻ Type: </b>Folder'
-                    msg += f'\n<b>🗃️ SubFolders: </b>{self.__total_folders}'
-                    msg += f'\n<b>🗂️ Files: </b>{self.__total_files}'
-                else:
-                    msg += f'<b>Name: </b><code>{f_name}</code>'
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(self.transferred_size)}'
-                    msg += f'\n<b>Type: </b>Folder'
-                    msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
-                    msg += f'\n<b>Files: </b>{self.__total_files}'
+                msg += f'<b>Name: </b><code>{f_name}</code>'
+                msg += f'\n<b>Size: </b>{get_readable_file_size(self.transferred_size)}'
+                msg += f'\n<b>Type: </b>Folder'
+                msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
+                msg += f'\n<b>Files: </b>{self.__total_files}'
                 buttons = ButtonMaker()
-                durl = short_url(durl, self.user_id)
                 if config_dict['DISABLE_DRIVE_LINK']:
                     if self.user_id == OWNER_ID:
                         buttons.buildbutton("☁️ Drive Link", durl)
@@ -407,17 +398,12 @@ class GoogleDriveHelper:
                 if INDEX_URL := INDEXURL:
                     url_path = rquote(f'{f_name}', safe='')
                     url = f'{INDEX_URL}/{url_path}/'
-                    url = short_url(url, self.user_id)
                     buttons.buildbutton("⚡ Index Link", url)
             else:
                 file = self.__copyFile(meta.get('id'), GDRIVEID, meta.get('name'))
-                if config_dict['EMOJI_THEME']:
-                    msg += f'<b>🗂️ Name: </b><code>{file.get("name")}</code>'
-                else:
-                    msg += f'<b>Name: </b><code>{file.get("name")}</code>'
+                msg += f'<b>Name: </b><code>{file.get("name")}</code>'
                 durl = self.__G_DRIVE_BASE_DOWNLOAD_URL.format(file.get("id"))
                 buttons = ButtonMaker()
-                durl = short_url(durl, self.user_id)
                 if config_dict['DISABLE_DRIVE_LINK']:
                     if self.user_id == OWNER_ID:
                         buttons.buildbutton("☁️ Drive Link", durl)
@@ -427,20 +413,14 @@ class GoogleDriveHelper:
                     buttons.buildbutton("☁️ Drive Link", durl)
                 if mime_type is None:
                     mime_type = 'File'
-                if config_dict['EMOJI_THEME']:
-                    msg += f'\n<b>📦 Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
-                    msg += f'\n<b>♻ Type: </b>{mime_type}'
-                else:
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
-                    msg += f'\n<b>Type: </b>{mime_type}'
+                msg += f'\n<b>Size: </b>{get_readable_file_size(int(meta.get("size", 0)))}'
+                msg += f'\n<b>Type: </b>{mime_type}'
                 if INDEX_URL := INDEXURL:
                     url_path = rquote(f'{file.get("name")}', safe='')
                     url = f'{INDEX_URL}/{url_path}'
-                    url = short_url(url, self.user_id)
                     buttons.buildbutton("⚡ Index Link", url)
                     if config_dict['VIEW_LINK']:
                         urls = f'{INDEX_URL}/{url_path}?a=view'
-                        urls = short_url(urls, self.user_id)
                         buttons.buildbutton("🌐 View Link", urls)
             if config_dict['BUTTON_FOUR_NAME'] != '' and config_dict['BUTTON_FOUR_URL'] != '':
                 buttons.buildbutton(f"{config_dict['BUTTON_FOUR_NAME']}", f"{config_dict['BUTTON_FOUR_URL']}")
@@ -622,16 +602,25 @@ class GoogleDriveHelper:
             for file in response.get('files', []):
                 mime_type = file.get('mimeType')
                 if mime_type == "application/vnd.google-apps.folder":
-                    if config_dict['SHORTENER']:
-                        furl = short_url(f"https://drive.google.com/drive/folders/{file.get('id')}", self.user_id)
-                    else:
-                        furl = f"https://drive.google.com/drive/folders/{file.get('id')}"
+                    furl = f"https://drive.google.com/drive/folders/{file.get('id')}"
                     if tegr:
                         msg += f"📁 <code>{file.get('name')}<br>(folder)</code><br>"
-                        msg += f"<b><a href='{furl}'>Drive Link</a></b>"
-                    else: 
+                        if config_dict['DISABLE_DRIVE_LINK']:
+                            if self.user_id == OWNER_ID:
+                                msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                            else:
+                                pass
+                        else:
+                            msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                    else:
                         msg += f"📁 <code>{file.get('name')}\n(folder)</code>\n"
-                        msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                        if config_dict['DISABLE_DRIVE_LINK']:
+                            if self.user_id == OWNER_ID:
+                                msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                            else:
+                                pass
+                        else:
+                            msg += f"<b><a href='{furl}'>Drive Link</a></b>"
                     if index_url:
                         if isRecur:
                             url_path = "/".join([rquote(n, safe='') for n in self.__get_recursive_list(file, dir_id)])
@@ -642,34 +631,36 @@ class GoogleDriveHelper:
                             msg += f' <b>| <a href="{url}">Index Link</a></b>'
                 elif mime_type == 'application/vnd.google-apps.shortcut':
                     furl = f"https://drive.google.com/drive/folders/{file.get('id')}"
-                    msg += f"⁍<a href='https://drive.google.com/drive/folders/{file.get('id')}'>{file.get('name')}" \
+                    msg += f"<a href='https://drive.google.com/drive/folders/{file.get('id')}'>{file.get('name')}" \
                            f"</a> (shortcut)"
                 else:
-                    if config_dict['SHORTENER']:
-                        furl = short_url("https://drive.google.com/uc?id={file.get('id')}&export=download", self.user_id)
-                    else:
-                        furl = f"https://drive.google.com/uc?id={file.get('id')}&export=download"
+                    furl = f"https://drive.google.com/uc?id={file.get('id')}&export=download"
                     if tegr:
                         msg += f"📄 <code>{file.get('name')}<br>({get_readable_file_size(int(file.get('size', 0)))})</code><br>"
-                        msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                        if config_dict['DISABLE_DRIVE_LINK']:
+                            if self.user_id == OWNER_ID:
+                                msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                            else:
+                                pass
+                        else:
+                             msg += f"<b><a href='{furl}'>Drive Link</a></b>"
                     else:
                         msg += f"📄 <code>{file.get('name')}\n({get_readable_file_size(int(file.get('size', 0)))})</code>\n"
-                        msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                        if config_dict['DISABLE_DRIVE_LINK']:
+                            if self.user_id == OWNER_ID:
+                                msg += f"<b><a href='{furl}'>Drive Link</a></b>"
+                            else:
+                                pass
+                        else:
+                            msg += f"<b><a href='{furl}'>Drive Link</a></b>"
                     if index_url:
                         if isRecur:
                             url_path = "/".join(rquote(n, safe='') for n in self.__get_recursive_list(file, dir_id))
                         else:
                             url_path = rquote(f'{file.get("name")}')
-                        if config_dict['SHORTENER']:
-                            url = short_url(f'{index_url}/{url_path}', self.user_id)
-                            msg += f' <b>| <a href="{url}">Index Link</a></b>'
-                        else:
-                            url = f'{index_url}/{url_path}'
-                            msg += f' <b>| <a href="{url}">Index Link</a></b>'
-                        if config_dict['SHORTENER']:
-                            urlv = short_url(f'{index_url}/{url_path}?a=view', self.user_id)
-                        else:
-                            urlv = f'{index_url}/{url_path}?a=view'
+                        url = f'{index_url}/{url_path}'
+                        msg += f' <b>| <a href="{url}">Index Link</a></b>'
+                        urlv = f'{index_url}/{url_path}?a=view'
                         if config_dict['VIEW_LINK']:
                             urlv = urlv
                             msg += f' <b>| <a href="{urlv}">View Link</a></b>'
@@ -740,35 +731,20 @@ class GoogleDriveHelper:
             mime_type = meta.get('mimeType')
             if mime_type == self.__G_DRIVE_DIR_MIME_TYPE:
                 self.__gDrive_directory(meta)
-                if config_dict['EMOJI_THEME']:
-                    msg += f'<b>🗂️ Name: </b><code>{name}</code>'
-                    msg += f'\n<b>📦 Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>♻ Type: </b>Folder'
-                    msg += f'\n<b>🗃️ SubFolders: </b>{self.__total_folders}'
-                else:
-                    msg += f'<b>Name: </b><code>{name}</code>'
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>Type: </b>Folder'
-                    msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
+                msg += f'<b>Name: </b><code>{name}</code>'
+                msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                msg += f'\n<b>Type: </b>Folder'
+                msg += f'\n<b>SubFolders: </b>{self.__total_folders}'
             else:
-                if config_dict['EMOJI_THEME']:
-                    msg += f'<b>🗂️ Name: </b><code>{name}</code>'
-                else:
-                    msg += f'<b>Name: </b><code>{name}</code>'
+                msg += f'<b>Name: </b><code>{name}</code>'
                 if mime_type is None:
                     mime_type = 'File'
                 self.__total_files += 1
                 self.__gDrive_file(meta)
-                if config_dict['EMOJI_THEME']:
-                    msg += f'\n<b>📦 Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>♻ Type: </b>{mime_type}'
-                else:
-                    msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
-                    msg += f'\n<b>Type: </b>{mime_type}'
-            if config_dict['EMOJI_THEME']:
-                msg += f'\n<b>🗂️ Files: </b>{self.__total_files}'
-            else:
+                msg += f'\n<b>Size: </b>{get_readable_file_size(self.__total_bytes)}'
+                msg += f'\n<b>Type: </b>{mime_type}'
                 msg += f'\n<b>Files: </b>{self.__total_files}'
+                
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
