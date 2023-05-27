@@ -22,9 +22,8 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'AUTO_DELETE_UPLOAD_MESSAGE_DURATION': -1,
                   'BOT_PM': False,
                   'FORCE_BOT_PM': False,
-                  'UPDATE_PACKAGES': 'False',
                   'UPSTREAM_BRANCH': 'master',
-                  'UPSTREAM_REPO': 'https://github.com/SN-Abdullah-Al-Noman/SN_WZML',
+                  'UPSTREAM_REPO': 'https://github.com/SN-Abdullah-Al-Noman/Atrocious_Mirror',
                   'STATUS_UPDATE_INTERVAL': 10,
                   'DOWNLOAD_DIR': '/usr/src/app/downloads/',
                   'TIME_GAP': -1,
@@ -37,8 +36,6 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'AUTHOR_NAME': 'Atrocious',
                   'AUTHOR_URL': 'https://t.me/AtrociousBotSupport',
                   'TITLE_NAME': 'Atrocious',
-                  'GD_INFO': 'Uploaded by Atrocious Mirror Bot',
-                  'CREDIT_NAME': 'Atrocious',
                   'NAME_FONT': 'code',
                   'CAPTION_FONT': 'code',
                   'FINISHED_PROGRESS_STR': '■',
@@ -50,7 +47,6 @@ default_values = {'AUTO_DELETE_MESSAGE_DURATION': 30,
                   'SAME_ACC_COOKIES': True,
                   'ENABLE_USR_TD': False,
                   'RSS_DELAY': 900,
-                  'ZIP_LEVEL': 0,
                   'ANIME_TEMPLATE': '''<b>{ro_title}</b>({na_title})
                                      <b>Format</b>: <code>{format}</code>
                                      <b>Status</b>: <code>{status}</code>
@@ -361,7 +357,9 @@ def load_config():
     if len(RSS_COMMAND) == 0:
         RSS_COMMAND = ''
 
-
+    SERVER_PORT = environ.get('SERVER_PORT', '')
+    SERVER_PORT = 80 if len(SERVER_PORT) == 0 else int(SERVER_PORT)
+    
     DRIVES_IDS.clear()
     DRIVES_NAMES.clear()
     INDEX_URLS.clear()
@@ -410,15 +408,11 @@ def load_config():
 
     UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
     if len(UPSTREAM_REPO) == 0: 
-        UPSTREAM_REPO = 'https://github.com/weebzone/WZML'
+        UPSTREAM_REPO = 'https://github.com/SN-Abdullah-Al-Noman/Atrocious_Mirror'
 
     UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
     if len(UPSTREAM_BRANCH) == 0:   
         UPSTREAM_BRANCH = 'master'
-
-    UPDATE_PACKAGES = environ.get('UPDATE_PACKAGES', '')
-    if len(UPDATE_PACKAGES) == 0:
-        UPDATE_PACKAGES = 'False'
 
     MIRROR_ENABLED = environ.get('MIRROR_ENABLED', '')
     MIRROR_ENABLED = MIRROR_ENABLED.lower() == 'true'
@@ -447,9 +441,6 @@ def load_config():
     LIST_MODE = environ.get('LIST_MODE', '')
     if len(LIST_MODE) == 0:
         LIST_MODE = "Telegraph"
-
-    EMOJI_THEME = environ.get('EMOJI_THEME', '')
-    EMOJI_THEME = EMOJI_THEME.lower() == 'true'
 
     DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
     DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
@@ -482,14 +473,14 @@ def load_config():
     START_BTN1_NAME = environ.get('START_BTN1_NAME', '')
     START_BTN1_URL = environ.get('START_BTN1_URL', '')
     if len(START_BTN1_NAME) == 0 or len(START_BTN1_URL) == 0:   
-        START_BTN1_NAME = 'Master'
-        START_BTN1_URL = 'https://t.me/krn_adhikari'
+        START_BTN1_NAME = 'Mirror Group'
+        START_BTN1_URL = 'https://t.me/+yw0A-x4cYBphZmJl'
 
     START_BTN2_NAME = environ.get('START_BTN2_NAME', '')
     START_BTN2_URL = environ.get('START_BTN2_URL', '')
     if len(START_BTN2_NAME) == 0 or len(START_BTN2_URL) == 0:   
-        START_BTN2_NAME = 'Support Group'
-        START_BTN2_URL = 'https://t.me/WeebZone_updates'
+        START_BTN2_NAME = 'Update Channel'
+        START_BTN2_URL = 'https://t.me/Atrocious_Bot_Update'
 
     BUTTON_FOUR_NAME = environ.get('BUTTON_FOUR_NAME', '')
     BUTTON_FOUR_URL = environ.get('BUTTON_FOUR_URL', '')
@@ -508,16 +499,6 @@ def load_config():
     if len(BUTTON_SIX_NAME) == 0 or len(BUTTON_SIX_URL) == 0:   
         BUTTON_SIX_NAME = ''
         BUTTON_SIX_URL = ''
-
-    SHORTENER = environ.get('SHORTENER', '')
-    SHORTENER_API = environ.get('SHORTENER_API', '')
-    if len(SHORTENER) == 0 or len(SHORTENER_API) == 0:  
-        SHORTENER = ''
-        SHORTENER_API = ''
-
-    GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
-    if len(GDTOT_CRYPT) == 0:
-        GDTOT_CRYPT = ''
 
     HUBDRIVE_CRYPT = environ.get('HUBDRIVE_CRYPT', '')
     if len(HUBDRIVE_CRYPT) == 0:
@@ -563,23 +544,15 @@ def load_config():
 
     AUTHOR_NAME = environ.get('AUTHOR_NAME', '')
     if len(AUTHOR_NAME) == 0:   
-        AUTHOR_NAME = 'WZML'
+        AUTHOR_NAME = 'Atrocious'
 
     AUTHOR_URL = environ.get('AUTHOR_URL', '')
     if len(AUTHOR_URL) == 0:    
-        AUTHOR_URL = 'https://t.me/WeebZone_updates'
+        AUTHOR_URL = 'https://t.me/Atrocious_Bot_Update'
 
     TITLE_NAME = environ.get('TITLE_NAME', '')
     if len(TITLE_NAME) == 0:    
-        TITLE_NAME = 'WeebZone'
-
-    GD_INFO = environ.get('GD_INFO', '')
-    if len(GD_INFO) == 0:   
-        GD_INFO = 'Uploaded by WeebZone Mirror Bot'
-
-    CREDIT_NAME = environ.get('CREDIT_NAME', '')
-    if len(CREDIT_NAME) == 0:   
-        CREDIT_NAME = 'WeebZone'
+        TITLE_NAME = 'Atrocious'
 
     NAME_FONT = environ.get('NAME_FONT', '')
     if len(NAME_FONT) == 0: 
@@ -672,27 +645,20 @@ def load_config():
     BASE_URL = environ.get('BASE_URL', '').rstrip("/")
     if len(BASE_URL) == 0:
         BASE_URL = ''
-
-    PORT = environ.get('PORT')
-    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
+        srun(["pkill", "-9", "-f", "gunicorn"])
+    else:
+        srun(["pkill", "-9", "-f", "gunicorn"])
+        Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
 
     SAFE_MODE = environ.get('SAFE_MODE', '')
     if len(SAFE_MODE) == 0:
         SAFE_MODE = ''
-   
-    ZIP_LEVEL = environ.get('ZIP_LEVEL', '')
-    if len(ZIP_LEVEL) == 0:
-        ZIP_LEVEL = 0
+
+    TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
+    if TOKEN_TIMEOUT.isdigit():
+        TOKEN_TIMEOUT = int(TOKEN_TIMEOUT)
     else:
-        ZIP_LEVEL = int(ZIP_LEVEL)
-
-    LEECH_CAPTION = environ.get('LEECH_CAPTION')
-    if len(LEECH_CAPTION) == 0:
-        LEECH_CAPTION = ''
-
-    REMOVE_FILE_TAG = environ.get('REMOVE_FILE_TAG')
-    if len(REMOVE_FILE_TAG) == 0:
-        REMOVE_FILE_TAG = ''
+        TOKEN_TIMEOUT = ''
 
     config_dict.update({'AS_DOCUMENT': AS_DOCUMENT,
                         'AUTHORIZED_CHATS': AUTHORIZED_CHATS,
@@ -724,6 +690,7 @@ def load_config():
                         'SEARCH_API_LINK': SEARCH_API_LINK,
                         'SEARCH_LIMIT': SEARCH_LIMIT,
                         'SEARCH_PLUGINS': SEARCH_PLUGINS,
+                        'SERVER_PORT': SERVER_PORT,
                         'STATUS_LIMIT': STATUS_LIMIT,
                         'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
@@ -736,7 +703,6 @@ def load_config():
                         'TORRENT_TIMEOUT': TORRENT_TIMEOUT,
                         'UPSTREAM_REPO': UPSTREAM_REPO,
                         'UPSTREAM_BRANCH': UPSTREAM_BRANCH,
-                        'UPDATE_PACKAGES': UPDATE_PACKAGES,
                         'UPTOBOX_TOKEN': UPTOBOX_TOKEN,
                         'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,
                         'VIEW_LINK': VIEW_LINK,
@@ -765,11 +731,7 @@ def load_config():
                         'TITLE_NAME': TITLE_NAME,
                         'AUTHOR_NAME': AUTHOR_NAME,
                         'AUTHOR_URL': AUTHOR_URL,
-                        'GD_INFO': GD_INFO,
                         'FSUB_IDS': FSUB_IDS,
-                        'SHORTENER': SHORTENER,
-                        'SHORTENER_API': SHORTENER_API,
-                        'GDTOT_CRYPT': GDTOT_CRYPT,
                         'HUBDRIVE_CRYPT': HUBDRIVE_CRYPT,
                         'KATDRIVE_CRYPT': KATDRIVE_CRYPT,
                         'KOLOP_CRYPT': KOLOP_CRYPT,
@@ -791,10 +753,8 @@ def load_config():
                         'TIME_GAP': TIME_GAP,
                         'FINISHED_PROGRESS_STR': FINISHED_PROGRESS_STR,
                         'UN_FINISHED_PROGRESS_STR': UN_FINISHED_PROGRESS_STR,
-                        'EMOJI_THEME': EMOJI_THEME,
                         'SHOW_LIMITS_IN_STATS': SHOW_LIMITS_IN_STATS,
                         'LIST_MODE': LIST_MODE,
-                        'CREDIT_NAME': CREDIT_NAME,
                         'WALLFLARE_SEARCH': WALLFLARE_SEARCH,
                         'WALLTIP_SEARCH': WALLTIP_SEARCH,
                         'WALLCRAFT_CATEGORY': WALLCRAFT_CATEGORY,
@@ -822,11 +782,9 @@ def load_config():
                         'MAX_PLAYLIST': MAX_PLAYLIST,
                         'YT_DLP_QUALITY': YT_DLP_QUALITY,
                         'SAFE_MODE': SAFE_MODE,
-                        'ZIP_LEVEL': ZIP_LEVEL,
-                        'LEECH_CAPTION':LEECH_CAPTION,
-                        'REMOVE_FILE_TAG': REMOVE_FILE_TAG})
+                        'TOKEN_TIMEOUT': TOKEN_TIMEOUT})
 
-
+    
     if DATABASE_URL:
         DbManger().update_config(config_dict)
     initiate_search_tools()
@@ -944,7 +902,7 @@ def edit_variable(update, context, omsg, key):
         aria2_options['bt-stop-timeout'] = f'{value}'
     elif key == 'TG_SPLIT_SIZE':
         value = min(int(value), tgBotMaxFileSize)
-    elif key == 'PORT':
+    elif key == 'SERVER_PORT':
         value = int(value)
         srun(["pkill", "-9", "-f", "gunicorn"])
         Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{value}", shell=True)
@@ -1174,7 +1132,7 @@ def edit_bot_settings(update, context):
                 DbManger().update_aria2('bt-stop-timeout', '0')
         elif data[2] == 'BASE_URL':
             srun(["pkill", "-9", "-f", "gunicorn"])
-        elif data[2] == 'PORT':
+        elif data[2] == 'SERVER_PORT':
             value = 80
             srun(["pkill", "-9", "-f", "gunicorn"])
             Popen("gunicorn web.wserver:app --bind 0.0.0.0:80", shell=True)

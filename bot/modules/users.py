@@ -4,9 +4,8 @@ from telegram.ext import CommandHandler
 
 from bot import config_dict, dispatcher, OWNER_ID
 from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import sendMessage, sendPhoto
 from bot.helper.telegram_helper.bot_commands import BotCommands
-
+from bot.helper.telegram_helper.message_utils import sendMessage, sendPhoto
 
 def dbusers(update, context):
     if not config_dict['DATABASE_URL']:
@@ -16,7 +15,6 @@ def dbusers(update, context):
         db = conn.mltb
         users_count = db.users.count_documents({})
         context.bot.send_message(chat_id=update.effective_chat.id, text=f"Total users in database: {users_count}")
-
 
 def get_id(update, context):
     chat_id = update.effective_chat.id
@@ -43,24 +41,14 @@ def bot_limit(update, context):
     total_task = 'No Limit Set' if TOTAL_TASKS_LIMIT == '' else f'{TOTAL_TASKS_LIMIT} Total Tasks/Time'
     user_task = 'No Limit Set' if USER_TASKS_LIMIT == '' else f'{USER_TASKS_LIMIT} Tasks/user'
 
-    if config_dict['EMOJI_THEME']: 
-        limit = f"<b>🔢 Bot Limitations </b>\n"\
-                f"🧲 Torrent/Direct: {torrent_direct}\n"\
-                f"🔐 Zip/Unzip: {zip_unzip}\n"\
-                f"🔷 Leech: {leech_limit}\n"\
-                f"♻️ Clone: {clone_limit}\n"\
-                f"🔰 Mega: {mega_limit}\n"\
-                f"💣 Total Tasks: {total_task}\n"\
-                f"🔫 User Tasks: {user_task}\n\n"
-    else: 
-        limit = f"<b>🔢 Bot Limitations </b>\n"\
-                f"Torrent/Direct: {torrent_direct}\n"\
-                f"Zip/Unzip: {zip_unzip}\n"\
-                f"Leech: {leech_limit}\n"\
-                f"Clone: {clone_limit}\n"\
-                f"Mega: {mega_limit}\n"\
-                f"Total Tasks: {total_task}\n"\
-                f"User Tasks: {user_task}\n\n"
+    limit = f"<b>BOT LIMITATIONS:</b>\n\n"\
+                f"<b>• Torrent-Direct:</b> {torrent_direct}\n"\
+                f"<b>• Zip-Unzip:</b> {zip_unzip}\n"\
+                f"<b>• Leech:</b> {leech_limit}\n"\
+                f"<b>• Clone:</b> {clone_limit}\n"\
+                f"<b>• Mega:</b> {mega_limit}\n"\
+                f"<b>• Total Tasks:</b> {total_task}\n"\
+                f"<b>• User Tasks:</b> {user_task}\n\n"
 
     if config_dict['PICS']:
         sendPhoto(limit, context.bot, update.message, rchoice(config_dict['PICS']))
@@ -68,11 +56,9 @@ def bot_limit(update, context):
         sendMessage(limit, context.bot, update.message)
 
 
+limit_handler = CommandHandler(BotCommands.LimitCommand, bot_limit, filters=CustomFilters.authorized_chat | CustomFilters.authorized_user)
 dbusers_handler = CommandHandler("dbusers", dbusers, filters=CustomFilters.owner_filter | CustomFilters.sudo_user)
 id_handler = CommandHandler("id", get_id)
-limit_handler = CommandHandler(BotCommands.LimitCommand, bot_limit,
-                               filters=CustomFilters.authorized_chat | CustomFilters.authorized_user)
-
 
 dispatcher.add_handler(dbusers_handler)
 dispatcher.add_handler(id_handler)
