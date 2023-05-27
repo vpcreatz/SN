@@ -356,9 +356,6 @@ def load_config():
     RSS_COMMAND = environ.get('RSS_COMMAND', '')
     if len(RSS_COMMAND) == 0:
         RSS_COMMAND = ''
-
-    SERVER_PORT = environ.get('SERVER_PORT', '')
-    SERVER_PORT = 80 if len(SERVER_PORT) == 0 else int(SERVER_PORT)
     
     DRIVES_IDS.clear()
     DRIVES_NAMES.clear()
@@ -647,8 +644,8 @@ def load_config():
         BASE_URL = ''
         srun(["pkill", "-9", "-f", "gunicorn"])
     else:
-        srun(["pkill", "-9", "-f", "gunicorn"])
-        Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
+        PORT = environ.get('PORT')
+        Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
 
     SAFE_MODE = environ.get('SAFE_MODE', '')
     if len(SAFE_MODE) == 0:
@@ -690,7 +687,6 @@ def load_config():
                         'SEARCH_API_LINK': SEARCH_API_LINK,
                         'SEARCH_LIMIT': SEARCH_LIMIT,
                         'SEARCH_PLUGINS': SEARCH_PLUGINS,
-                        'SERVER_PORT': SERVER_PORT,
                         'STATUS_LIMIT': STATUS_LIMIT,
                         'STATUS_UPDATE_INTERVAL': STATUS_UPDATE_INTERVAL,
                         'STOP_DUPLICATE': STOP_DUPLICATE,
