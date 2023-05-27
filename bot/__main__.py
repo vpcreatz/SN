@@ -1,3 +1,4 @@
+from uuid import uuid4
 from bs4 import BeautifulSoup
 from signal import signal, SIGINT
 from requests import get as rget
@@ -12,7 +13,7 @@ from sys import executable
 from pytz import timezone
 from telegram.ext import CommandHandler
 
-from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
+from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time, format_validity_time
 from .helper.ext_utils.db_handler import DbManger
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.telegraph_helper import telegraph
@@ -21,38 +22,20 @@ from .helper.telegram_helper.message_utils import sendMessage, editMessage, send
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.button_build import ButtonMaker
 from bot import config_dict, botStartTime, Interval, QbInterval, LOGGER, DATABASE_URL, bot, dispatcher, updater, IGNORE_PENDING_REQUESTS, \
-                app, main_loop, alive
+                app, main_loop, user_data
 from .modules import authorize, list, cancel_mirror, mirror_status, mirror_leech, clone, ytdlp, shell, eval, bot_settings, \
                      delete, count, users_settings, search, rss, wayback, speedtest, anilist, imdb, bt_select, mediainfo, hash, \
                      scraper, pictures, save_msg, sel_cat, users, drive_clean, broadcast
 
-version = "5.0.0"
-
-def progress_bar(percentage):
-    p_used = config_dict['FINISHED_PROGRESS_STR']
-    p_total = config_dict['UN_FINISHED_PROGRESS_STR']
-    if isinstance(percentage, str):
-        return 'NaN'
-    try:
-        percentage=int(percentage)
-    except:
-        percentage = 0
-    return ''.join(
-        p_used if i <= percentage // 10 else p_total for i in range(1, 11)
-    )
-
-
+version = "Master Branch 5.0.3"
 timez = config_dict['TIMEZONE']
 now=datetime.now(timezone(f'{timez}'))
 
+
 def stats(update, context):
     if ospath.exists('.git'):
-        if config_dict['EMOJI_THEME']:
-            last_commit = check_output(["git log -1 --date=short --pretty=format:'%cd \n🛠 From: %cr'"], shell=True).decode()
-            botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
-        else:
-            last_commit = check_output(["git log -1 --date=short --pretty=format:'%cd \nFrom: %cr'"], shell=True).decode()
-            botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
+        last_commit = check_output(["git log -1 --date=short --pretty=format:'%cd \n<b>• From:</b> %cr'"], shell=True).decode()
+        botVersion = check_output(["git log -1 --date=format:v%y.%m%d.%H%M --pretty=format:%cd"], shell=True).decode()
     else:
         botVersion = 'No UPSTREAM_REPO'
         last_commit = 'No UPSTREAM_REPO'
@@ -77,36 +60,19 @@ def stats(update, context):
     mem_t = get_readable_file_size(memory.total)
     mem_a = get_readable_file_size(memory.available)
     mem_u = get_readable_file_size(memory.used)
-    if config_dict['EMOJI_THEME']:
-            stats = f'<b>       📊 Bot Statistics </b>\n' \
-                    f'🛠 Updated On: {last_commit}\n'\
-                    f'⏰️ Uptime: {currentTime}\n'\
-                    f'🤖 Version: {version}\n'\
-                    f'🟢 OS Uptime: {osUptime}\n'\
-                    f'🖥︄ CPU: [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
-                    f'🎮 RAM: [{progress_bar(mem_p)}] {mem_p}%\n'\
-                    f'💾 Disk: [{progress_bar(disk)}] {disk}%\n'\
-                    f'💿 Disk Free: {free}\n'\
-                    f'🔺 Upload Data: {sent}\n'\
-                    f'🔻 Download Data: {recv}\n\n'
-
-    else:
-            stats = f'<b>    📊 Bot Statistics </b>\n' \
-                    f'Updated On: {last_commit}\n'\
-                    f'Uptime: {currentTime}\n'\
-                    f'Version: {version}\n'\
-                    f'OS Uptime: {osUptime}\n'\
-                    f'CPU: [{progress_bar(cpuUsage)}] {cpuUsage}%\n'\
-                    f'RAM: [{progress_bar(mem_p)}] {mem_p}%\n'\
-                    f'Disk: [{progress_bar(disk)}] {disk}%\n'\
-                    f'Disk Free: {free}\n'\
-                    f'Upload Data: {sent}\n'\
-                    f'Download Data: {recv}\n\n'
-
-
-
+    stats = f'<b>BOT STATISTICS: </b>\n\n' \
+            f'<b>• Updated On:</b> {last_commit}\n'\
+            f'<b>• Bot Uptime:</b> {currentTime}\n'\
+            f'<b>• Version:</b> {version}\n'\
+            f'<b>• OS Uptime:</b> {osUptime}\n'\
+            f'<b>• CPU USE:</b> {cpuUsage}%\n'\
+            f'<b>• RAM USE:</b> {mem_p}%\n'\
+            f'<b>• DISK USE:</b> {disk}%\n'\
+            f'<b>• DISK FREE:</b> {free}\n'\
+            f'<b>• UPLOAD DATA:</b> {sent}\n'\
+            f'<b>• DOWNLOAD DATA:</b> {recv}\n\n'
+            
     if config_dict['SHOW_LIMITS_IN_STATS']:
-
         TORRENT_DIRECT_LIMIT = config_dict['TORRENT_DIRECT_LIMIT']
         CLONE_LIMIT = config_dict['CLONE_LIMIT']
         MEGA_LIMIT = config_dict['MEGA_LIMIT']
@@ -123,24 +89,14 @@ def stats(update, context):
         total_task = 'No Limit Set' if TOTAL_TASKS_LIMIT == '' else f'{TOTAL_TASKS_LIMIT} Total Tasks/Time'
         user_task = 'No Limit Set' if USER_TASKS_LIMIT == '' else f'{USER_TASKS_LIMIT} Tasks/user'
 
-        if config_dict['EMOJI_THEME']: 
-            stats += f'<b>🔢 Bot Limitations </b>\n'\
-                     f'🧲 Torrent/Direct: {torrent_direct}\n'\
-                     f'🔐 Zip/Unzip: {zip_unzip}\n'\
-                     f'🔷 Leech: {leech_limit}\n'\
-                     f'♻️ Clone: {clone_limit}\n'\
-                     f'🔰 Mega: {mega_limit}\n'\
-                     f'💣 Total Tasks: {total_task}\n'\
-                     f'🔫 User Tasks: {user_task}\n\n'
-        else: 
-            stats += f'<b>🔢 Bot Limitations </b>\n'\
-                     f'Torrent/Direct: {torrent_direct}\n'\
-                     f'Zip/Unzip: {zip_unzip}\n'\
-                     f'Leech: {leech_limit}\n'\
-                     f'Clone: {clone_limit}\n'\
-                     f'Mega: {mega_limit}\n'\
-                     f'Total Tasks: {total_task}\n'\
-                     f'User Tasks: {user_task}\n\n'
+        stats += f'<b>BOT LIMITATIONS: </b>\n\n'\
+                 f'<b>• Torrent-Direct:</b> {torrent_direct}\n'\
+                 f'<b>• Zip-Unzip:</b> {zip_unzip}\n'\
+                 f'<b>• Leech:</b> {leech_limit}\n'\
+                 f'<b>• Clone:</b> {clone_limit}\n'\
+                 f'<b>• Mega:</b> {mega_limit}\n'\
+                 f'<b>• Total Tasks:</b> {total_task}\n'\
+                 f'<b>• User Tasks:</b> {user_task}\n\n'
 
     if config_dict['PICS']:
         sendPhoto(stats, context.bot, update.message, rchoice(config_dict['PICS']))
@@ -148,29 +104,37 @@ def stats(update, context):
         sendMessage(stats, context.bot, update.message)
 
 def start(update, context):
-    buttons = ButtonMaker()
-    if config_dict['EMOJI_THEME']:
-        buttons.buildbutton(f"{config_dict['START_BTN1_NAME']}", f"{config_dict['START_BTN1_URL']}")
-        buttons.buildbutton(f"{config_dict['START_BTN2_NAME']}", f"{config_dict['START_BTN2_URL']}")
+    token_timeout = config_dict['TOKEN_TIMEOUT']
+    message = update.message
+
+    if len(message.text.split()) > 1:
+        userid = message.from_user.id
+        input_token = message.text.split()[1]
+        if userid not in user_data:
+            return update.message.reply_text('Who are you? Do not try to be over smart')
+        data = user_data[userid]
+        if 'token' not in data or data['token'] != input_token:
+            return update.message.reply_text('This ads token is already expired')
+        data['token'] = str(uuid4())
+        data['time'] = time()
+        user_data[userid].update(data)
+        time_str = format_validity_time(token_timeout)
+        return update.message.reply_text(f'Congratulations! Ads token refreshed successfully!\n\n<b>It will expire after</b> {time_str}')  
     else:
+        buttons = ButtonMaker()
         buttons.buildbutton(f"{config_dict['START_BTN1_NAME']}", f"{config_dict['START_BTN1_URL']}")
         buttons.buildbutton(f"{config_dict['START_BTN2_NAME']}", f"{config_dict['START_BTN2_URL']}")
-    reply_markup = buttons.build_menu(2)
-    if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update):
-        start_string = f'''This bot can mirror all your links to Google Drive!
-Type /{BotCommands.HelpCommand} to get a list of available commands
-'''
+        reply_markup = buttons.build_menu(2)
+      
+        if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update) or config_dict['IS_PUBLIC_BOT']:
+            start_string = f"This bot can mirror all your links to Google Drive! Type /{BotCommands.HelpCommand} to get a list of available commands"
+        else:
+            start_string = f"Not Authorized user, deploy your own mirror bot"
+        
         if config_dict['PICS']:
             sendPhoto(start_string, context.bot, update.message, rchoice(config_dict['PICS']), reply_markup)
         else:
             sendMessage(start_string, context.bot, update.message, reply_markup)
-    else:
-        text = f"Not Authorized user, deploy your own mirror bot"
-        if config_dict['PICS']:
-            sendPhoto(text, context.bot, update.message, rchoice(config_dict['PICS']), reply_markup)
-        else:
-            sendMessage(text, context.bot, update.message, reply_markup)
-
 
 def restart(update, context):
     restart_message = sendMessage("Bot Restarting...", context.bot, update.message)
@@ -180,7 +144,6 @@ def restart(update, context):
     if QbInterval:
         QbInterval[0].cancel()
         QbInterval.clear()
-    alive.kill()
     clean_all()
     srun(["pkill", "-9", "-f", "gunicorn|aria2c|qbittorrent-nox|ffmpeg"])
     srun(["python3", "update.py"])
@@ -189,25 +152,17 @@ def restart(update, context):
         f.write(f"{restart_message.chat.id}\n{restart_message.message_id}\n")
     osexecl(executable, executable, "-m", "bot")
 
-
 def ping(update, context):
-    if config_dict['EMOJI_THEME']:
-        start_time = int(round(time() * 1000))
-        reply = sendMessage("Starting_Ping", context.bot, update.message)
-        end_time = int(round(time() * 1000))
-        editMessage(f'{end_time - start_time} ms 🔥', reply)
-    else:
-        start_time = int(round(time() * 1000))
-        reply = sendMessage("Starting_Ping ", context.bot, update.message)
-        end_time = int(round(time() * 1000))
-        editMessage(f'{end_time - start_time} ms ', reply)
-
+    start_time = int(round(time() * 1000))
+    reply = sendMessage("Starting_Ping ", context.bot, update.message)
+    end_time = int(round(time() * 1000))
+    editMessage(f'{end_time - start_time} ms ', reply)
+        
 def log(update, context):
     sendLogFile(context.bot, update.message)
 
-
 help_string = '''
-<b><a href='https://github.com/SN-Abdullah-Al-Noman/SN_WZML'>SN_WZML</a></b> - The Ultimate Telegram MIrror-Leech Bot to Upload Your File & Link in Google Drive & Telegram
+<b><a href='https://github.com/SN-Abdullah-Al-Noman/Atrocious_Mirror'>Atrocious-Mirror</a></b> - The Ultimate Telegram MIrror-Leech Bot to Upload Your File & Link in Google Drive & Telegram
 Choose a help category:
 '''
 
@@ -313,48 +268,15 @@ help_string_telegraph_admin = f'''
 • <b>/{BotCommands.LogCommand}</b>: Get a log file of the bot. Handy for getting crash reports
 '''
 
-help_string_telegraph_admin = f'''
-<b><u>🛡️ Admin Commands</u></b>
-<br><br>
-• <b>/{BotCommands.PingCommand}</b>: Check how long it takes to Ping the Bot
-<br><br>
-• <b>/{BotCommands.AuthorizeCommand}</b>: Authorize a chat or a user to use the bot (Can only be invoked by Owner & Sudo of the bot)
-<br><br>
-• <b>/{BotCommands.UnAuthorizeCommand}</b>: Unauthorize a chat or a user to use the bot (Can only be invoked by Owner & Sudo of the bot)
-<br><br>
-• <b>/{BotCommands.UsersCommand}</b>: show users settings (Only Owner & Sudo).
-<br><br>
-• <b>/{BotCommands.AddSudoCommand}</b>: Add sudo user (Only Owner)
-<br><br>
-• <b>/{BotCommands.RmSudoCommand}</b>: Remove sudo users (Only Owner)
-<br><br>
-• <b>/{BotCommands.PaidUsersCommand}</b>: Show Paid users (Only Owner & Sudo)
-<br><br>
-• <b>/{BotCommands.AddPaidCommand}</b>: Authorize Paid users (Only Owner)
-<br><br>
-• <b>/{BotCommands.RmPaidCommand}</b>: Unauthorize Paid users (Only Owner)
-<br><br>
-• <b>/{BotCommands.RestartCommand}</b>: Restart and update the bot (Only Owner & Sudo)
-<br><br>
-• <b>/{BotCommands.LogCommand}</b>: Get a log file of the bot. Handy for getting crash reports
-'''
-
-
 help_admin = telegraph.create_page(
     title=f"{config_dict['TITLE_NAME']} Help",
     content=help_string_telegraph_admin)["path"]
 
-
 def bot_help(update, context):
     button = ButtonMaker()
-    if config_dict['EMOJI_THEME']:
-        button.buildbutton("👤 User", f"https://telegra.ph/{help_user}")
-        button.buildbutton("🔰 Admin", f"https://telegra.ph/{help_admin}")
-    else:
-        button.buildbutton("User", f"https://telegra.ph/{help_user}")
-        button.buildbutton("Admin", f"https://telegra.ph/{help_admin}")
+    button.buildbutton("User", f"https://telegra.ph/{help_user}")
+    button.buildbutton("Admin", f"https://telegra.ph/{help_admin}")
     sendMessage(help_string, context.bot, update.message, button.build_menu(2))
-
 
 if config_dict['SET_BOT_COMMANDS']:
     botcmds = [
@@ -395,7 +317,6 @@ if config_dict['SET_BOT_COMMANDS']:
         (f'{BotCommands.HelpCommand}','Get detailed help'),
         (f'{BotCommands.LimitCommand}','Get Bot Limitation')
     ]
-
 
 def main():
     try:
@@ -464,8 +385,9 @@ def main():
                 msg += f"Date: {date}\n"
                 msg += f"Time: {time}\n"
                 msg += f"Time Zone: {timez}\n"
-                msg += f"Repo Version: {version}"
-
+                msg += f"Repo Version: {version}\n\n"
+                msg += f"Incomplete Tasks ⬇️ \n"
+                
                 for tag, links in data.items():
                     msg += f"\n{tag}: "
                     for index, link in enumerate(links, start=1):
@@ -509,8 +431,6 @@ def main():
             LOGGER.info(e)
         osremove(".restartmsg")
 
-     
-
     start_handler = CommandHandler(BotCommands.StartCommand, start)
     log_handler = CommandHandler(BotCommands.LogCommand, log,
                                filters=CustomFilters.owner_filter | CustomFilters.sudo_user)
@@ -522,7 +442,6 @@ def main():
                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user)
     stats_handler = CommandHandler(BotCommands.StatsCommand, stats,
                                filters=CustomFilters.authorized_chat | CustomFilters.authorized_user)
-
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(ping_handler)
@@ -536,5 +455,4 @@ def main():
 
 app.start()
 main()
-
 main_loop.run_forever()

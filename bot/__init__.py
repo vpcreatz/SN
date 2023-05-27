@@ -34,6 +34,7 @@ load_dotenv('config.env', override=True)
 
 Interval = []
 QbInterval = []
+shorteneres_list = []
 DRIVES_NAMES = []
 DRIVES_IDS = []
 INDEX_URLS = []
@@ -268,11 +269,14 @@ if len(TG_SPLIT_SIZE) == 0 or int(TG_SPLIT_SIZE) > tgBotMaxFileSize:
     TG_SPLIT_SIZE = tgBotMaxFileSize
 else:
     TG_SPLIT_SIZE = int(TG_SPLIT_SIZE)
+    
+RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
+RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
 
 try:
     USER_SESSION_STRING = environ.get('USER_SESSION_STRING', '')
     if len(USER_SESSION_STRING) != 0:
-        premium_session = Client('WZML-Premium', api_id=TELEGRAM_API, api_hash=TELEGRAM_HASH, session_string=USER_SESSION_STRING, parse_mode=enums.ParseMode.HTML, no_updates=True)
+        premium_session = Client('Atrocious-Premium', api_id=TELEGRAM_API, api_hash=TELEGRAM_HASH, session_string=USER_SESSION_STRING, parse_mode=enums.ParseMode.HTML, no_updates=True)
     if not premium_session:
         LOGGER.error("Cannot initialized User Session. Please regenerate USER_SESSION_STRING")
     else:
@@ -391,9 +395,6 @@ RSS_COMMAND = environ.get('RSS_COMMAND', '')
 if len(RSS_COMMAND) == 0:
     RSS_COMMAND = ''
 
-RSS_CHAT_ID = environ.get('RSS_CHAT_ID', '')
-RSS_CHAT_ID = '' if len(RSS_CHAT_ID) == 0 else int(RSS_CHAT_ID)
-
 RSS_DELAY = environ.get('RSS_DELAY', '')
 RSS_DELAY = 900 if len(RSS_DELAY) == 0 else int(RSS_DELAY)
 
@@ -465,9 +466,6 @@ LIST_MODE = environ.get('LIST_MODE', '')
 if len(LIST_MODE) == 0:
     LIST_MODE = "Telegraph"
 
-EMOJI_THEME = environ.get('EMOJI_THEME', '')
-EMOJI_THEME = EMOJI_THEME.lower() == 'true'
-
 DISABLE_DRIVE_LINK = environ.get('DISABLE_DRIVE_LINK', '')
 DISABLE_DRIVE_LINK = DISABLE_DRIVE_LINK.lower() == 'true'
 
@@ -526,19 +524,6 @@ if len(BUTTON_SIX_NAME) == 0 or len(BUTTON_SIX_URL) == 0:
     BUTTON_SIX_NAME = ''
     BUTTON_SIX_URL = ''
 
-SHORTENER = environ.get('SHORTENER', '')
-SHORTENER_API = environ.get('SHORTENER_API', '')
-if len(SHORTENER) == 0 or len(SHORTENER_API) == 0:
-    SHORTENER = ''
-    SHORTENER_API = ''
-SHORTENER = (SHORTENER.replace("'", '').replace('"', '').replace('[', '').replace(']', '').replace(",", "")).split()
-SHORTENER_API = (SHORTENER_API.replace("'", '').replace('"', '').replace('[', '').replace(']', '').replace(",", "")).split()
-
-
-GDTOT_CRYPT = environ.get('GDTOT_CRYPT', '')
-if len(GDTOT_CRYPT) == 0:
-    GDTOT_CRYPT = ''
-
 HUBDRIVE_CRYPT = environ.get('HUBDRIVE_CRYPT', '')
 if len(HUBDRIVE_CRYPT) == 0:
     HUBDRIVE_CRYPT = ''
@@ -583,23 +568,15 @@ else:
 
 AUTHOR_NAME = environ.get('AUTHOR_NAME', '')
 if len(AUTHOR_NAME) == 0:
-    AUTHOR_NAME = 'WZML'
+    AUTHOR_NAME = 'Atrocious'
 
 AUTHOR_URL = environ.get('AUTHOR_URL', '')
 if len(AUTHOR_URL) == 0:
-    AUTHOR_URL = 'https://t.me/WeebZone_updates'
+    AUTHOR_URL = 'https://t.me/Atrocious_Bot_Update'
 
 TITLE_NAME = environ.get('TITLE_NAME', '')
 if len(TITLE_NAME) == 0:
-    TITLE_NAME = 'WeebZone'
-
-GD_INFO = environ.get('GD_INFO', '')
-if len(GD_INFO) == 0:
-    GD_INFO = 'Uploaded by WeebZone Mirror Bot'
-
-CREDIT_NAME = environ.get('CREDIT_NAME', '')
-if len(CREDIT_NAME) == 0:
-    CREDIT_NAME = 'WeebZone'
+    TITLE_NAME = 'Atrocious'
 
 NAME_FONT = environ.get('NAME_FONT', '')
 if len(NAME_FONT) == 0:
@@ -652,6 +629,12 @@ if len(WALLCRAFT_CATEGORY) == 0:
 PICS = environ.get('PICS', '')
 PICS = (PICS.replace("'", '').replace('"', '').replace('[', '').replace(']', '').replace(",", "")).split()
 
+SERVER_PORT = environ.get('SERVER_PORT', '')
+if len(SERVER_PORT) == 0:
+    SERVER_PORT = 80
+else:
+    SERVER_PORT = int(SERVER_PORT)
+    
 YT_DLP_QUALITY = environ.get('YT_DLP_QUALITY', '')
 if len(YT_DLP_QUALITY) == 0:
     YT_DLP_QUALITY = ''
@@ -663,15 +646,11 @@ if len(BASE_URL) == 0:
 
 UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
 if len(UPSTREAM_REPO) == 0:
-   UPSTREAM_REPO = 'https://github.com/SN-Abdullah-Al-Noman/SN_WZML'
+   UPSTREAM_REPO = 'https://github.com/SN-Abdullah-Al-Noman/Atrocious_Mirror'
 
 UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
 if len(UPSTREAM_BRANCH) == 0:
     UPSTREAM_BRANCH = 'master'
-
-UPDATE_PACKAGES = environ.get('UPDATE_PACKAGES', '')
-if len(UPDATE_PACKAGES) == 0:
-    UPDATE_PACKAGES = ''
 
 SAFE_MODE = environ.get('SAFE_MODE', '')
 if len(SAFE_MODE) == 0:
@@ -682,19 +661,11 @@ else:
     FORCE_BOT_PM = 'True'
     SAFE_MODE = 'True'
 
-ZIP_LEVEL = environ.get('ZIP_LEVEL', '')
-if len(ZIP_LEVEL) == 0:
-    ZIP_LEVEL = 0
+TOKEN_TIMEOUT = environ.get('TOKEN_TIMEOUT', '')
+if TOKEN_TIMEOUT.isdigit():
+    TOKEN_TIMEOUT = int(TOKEN_TIMEOUT)
 else:
-    ZIP_LEVEL = int(ZIP_LEVEL)
-
-LEECH_CAPTION = environ.get('LEECH_CAPTION')
-if len(LEECH_CAPTION) == 0:
-    LEECH_CAPTION = ''
-
-REMOVE_FILE_TAG = environ.get('REMOVE_FILE_TAG')
-if len(REMOVE_FILE_TAG) == 0:
-    REMOVE_FILE_TAG = ''
+    TOKEN_TIMEOUT = ''
 
 config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'AS_DOCUMENT': AS_DOCUMENT,
@@ -713,7 +684,6 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'BUTTON_SIX_NAME': BUTTON_SIX_NAME,
                'BUTTON_SIX_URL': BUTTON_SIX_URL,
                'CAPTION_FONT': CAPTION_FONT,
-               'CREDIT_NAME': CREDIT_NAME,
                'CLONE_ENABLED': CLONE_ENABLED,
                'CLONE_LIMIT': CLONE_LIMIT,
                'CMD_SUFFIX': CMD_SUFFIX,
@@ -727,7 +697,6 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'OWNER_ID': OWNER_ID,
                'EQUAL_SPLITS': EQUAL_SPLITS,
                'EXTENSION_FILTER': EXTENSION_FILTER,
-               'EMOJI_THEME': EMOJI_THEME,
                'GDRIVE_ID': GDRIVE_ID,               
                'IGNORE_PENDING_REQUESTS': IGNORE_PENDING_REQUESTS,
                'INCOMPLETE_TASK_NOTIFIER': INCOMPLETE_TASK_NOTIFIER,
@@ -762,12 +731,10 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'TIMEZONE': TIMEZONE,
                'TGH_THUMB': TGH_THUMB,
                'TITLE_NAME': TITLE_NAME,
-               'GD_INFO': GD_INFO,
                'FSUB_IDS': FSUB_IDS,
                'SA_MAIL': SA_MAIL,
-               'SHORTENER': SHORTENER,
-               'SHORTENER_API': SHORTENER_API,
                'SEARCH_API_LINK': SEARCH_API_LINK,
+               'SERVER_PORT': SERVER_PORT,
                'SEARCH_LIMIT': SEARCH_LIMIT,
                'SEARCH_PLUGINS': SEARCH_PLUGINS,
                'STATUS_LIMIT': STATUS_LIMIT,
@@ -784,7 +751,6 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'UPTOBOX_TOKEN': UPTOBOX_TOKEN,
                'USE_SERVICE_ACCOUNTS': USE_SERVICE_ACCOUNTS,               
                'VIEW_LINK': VIEW_LINK,
-               'GDTOT_CRYPT': GDTOT_CRYPT,
                'HUBDRIVE_CRYPT': HUBDRIVE_CRYPT,
                'KATDRIVE_CRYPT': KATDRIVE_CRYPT,
                'KOLOP_CRYPT': KOLOP_CRYPT,
@@ -814,7 +780,6 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'PIXABAY_SEARCH': PIXABAY_SEARCH,
                'PICS': PICS,
                'NAME_FONT': NAME_FONT,
-               'UPDATE_PACKAGES': UPDATE_PACKAGES,
                'SOURCE_LINK': SOURCE_LINK,
                'START_BTN1_NAME': START_BTN1_NAME,
                'START_BTN1_URL': START_BTN1_URL,
@@ -825,9 +790,7 @@ config_dict = {'ANILIST_ENABLED': ANILIST_ENABLED,
                'MAX_PLAYLIST': MAX_PLAYLIST,
                'YT_DLP_QUALITY': YT_DLP_QUALITY,
                'SAFE_MODE': SAFE_MODE,
-               'ZIP_LEVEL': ZIP_LEVEL,
-               'LEECH_CAPTION': LEECH_CAPTION,
-               'REMOVE_FILE_TAG': REMOVE_FILE_TAG}
+               'TOKEN_TIMEOUT': TOKEN_TIMEOUT}
 
 if GDRIVE_ID:
     DRIVES_NAMES.append("Main")
@@ -851,6 +814,14 @@ if GDRIVE_ID:
     CATEGORY_IDS.append(GDRIVE_ID)
     CATEGORY_INDEX.append(INDEX_URL)
 
+if ospath.exists('shorteners.txt'):
+    with open('shorteners.txt', 'r+') as f:
+        lines = f.readlines()
+        for line in lines:
+            temp = line.strip().split()
+            if len(temp) == 2:
+                shorteneres_list.append({'domain': temp[0],'api_key': temp[1]})
+
 if ospath.exists('categories.txt'):
     with open('categories.txt', 'r+') as f:
         lines = f.readlines()
@@ -864,9 +835,9 @@ if ospath.exists('categories.txt'):
                 CATEGORY_INDEX.append('')
 
 
-PORT = environ.get('PORT')
-Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
-alive = Popen(["python3", "alive.py"])
+if BASE_URL:
+    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
+
 srun(["qbittorrent-nox", "-d", "--profile=."])
 if not ospath.exists('.netrc'):
     srun(["touch", ".netrc"])
@@ -934,5 +905,6 @@ else:
 tgDefaults = Defaults(parse_mode='HTML', disable_web_page_preview=True, allow_sending_without_reply=True, run_async=True)
 updater = tgUpdater(token=BOT_TOKEN, defaults=tgDefaults, request_kwargs={'read_timeout': 20, 'connect_timeout': 15})
 bot = updater.bot
+bot_name = bot.username.lstrip('@')
 dispatcher = updater.dispatcher
 job_queue = updater.job_queue
