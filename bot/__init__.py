@@ -629,12 +629,6 @@ if len(WALLCRAFT_CATEGORY) == 0:
 PICS = environ.get('PICS', '')
 PICS = (PICS.replace("'", '').replace('"', '').replace('[', '').replace(']', '').replace(",", "")).split()
 
-SERVER_PORT = environ.get('SERVER_PORT', '')
-if len(SERVER_PORT) == 0:
-    SERVER_PORT = 80
-else:
-    SERVER_PORT = int(SERVER_PORT)
-    
 YT_DLP_QUALITY = environ.get('YT_DLP_QUALITY', '')
 if len(YT_DLP_QUALITY) == 0:
     YT_DLP_QUALITY = ''
@@ -646,7 +640,7 @@ if len(BASE_URL) == 0:
 
 UPSTREAM_REPO = environ.get('UPSTREAM_REPO', '')
 if len(UPSTREAM_REPO) == 0:
-   UPSTREAM_REPO = 'https://github.com/SN-Abdullah-Al-Noman/Atrocious_Mirror'
+   UPSTREAM_REPO = 'https://github.com/SN-Abdullah-Al-Noman/SN_WZML'
 
 UPSTREAM_BRANCH = environ.get('UPSTREAM_BRANCH', '')
 if len(UPSTREAM_BRANCH) == 0:
@@ -835,9 +829,9 @@ if ospath.exists('categories.txt'):
                 CATEGORY_INDEX.append('')
 
 
-if BASE_URL:
-    Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{SERVER_PORT}", shell=True)
-
+PORT = environ.get('PORT')
+Popen(f"gunicorn web.wserver:app --bind 0.0.0.0:{PORT}", shell=True)
+alive = Popen(["python3", "alive.py"])
 srun(["qbittorrent-nox", "-d", "--profile=."])
 if not ospath.exists('.netrc'):
     srun(["touch", ".netrc"])
