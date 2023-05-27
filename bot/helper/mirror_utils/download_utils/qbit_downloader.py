@@ -202,8 +202,9 @@ def __check_limits(client, tor):
                 if config_dict['PAID_SERVICE'] is True:
                     msg += f'\nBuy Paid Service'
                 __onDownloadError(msg, client, tor)
-                return
-                limit = None
+        else:
+            pass
+        limit = None
         if ZIP_UNZIP_LIMIT and arch:
             mssg = f'Zip/Unzip limit is {ZIP_UNZIP_LIMIT}GB'
             limit = ZIP_UNZIP_LIMIT
