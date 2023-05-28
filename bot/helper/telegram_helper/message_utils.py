@@ -73,19 +73,6 @@ def sendRss(text, bot):
             return
 
 
-async def sendRss_pyro(text: str):
-    rss_session = Client(name='rss_session', api_id=int(TELEGRAM_API), api_hash=TELEGRAM_HASH, session_string=USER_STRING_SESSION, parse_mode=enums.ParseMode.HTML)
-    await rss_session.start()
-    try:
-        return await rss_session.send_message(config_dict['RSS_CHAT_ID'], text, disable_web_page_preview=True)
-    except FloodWait as e:
-        LOGGER.warning(str(e))
-        await asleep(e.value * 1.5)
-        return await sendRss(text)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return
-
 def sendPhoto(text, bot, message, photo, reply_markup=None):
     try:
         return bot.send_photo(chat_id=message.chat_id, photo=photo, reply_to_message_id=message.message_id,
@@ -194,7 +181,7 @@ def auto_delete_upload_message(bot, cmd_message=None, bot_message=None):
         if bot_message is not None:
             deleteMessage(bot, bot_message)
 
-           
+
 def delete_all_messages():
     with status_reply_dict_lock:
         for data in list(status_reply_dict.values()):
